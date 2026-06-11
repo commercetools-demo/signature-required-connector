@@ -1,0 +1,44 @@
+deployAs:
+  - name: service
+    applicationType: service
+    endpoint: /service
+    scripts:
+      # Connect runs lifecycle scripts from the application directory (service/).
+      # Java connectors are built with Maven; these mains use the commercetools Java SDK.
+      postDeploy: mvn -B -q compile exec:java -Dexec.mainClass=com.commercetools.signature.connector.PostDeploy
+      preUndeploy: mvn -B -q compile exec:java -Dexec.mainClass=com.commercetools.signature.connector.PreUndeploy
+    configuration:
+      standardConfiguration:
+        - key: NARCOTICS_ATTRIBUTE_NAME
+          description: Boolean product-variant attribute name that marks a product as narcotics.
+          required: false
+          default: 'narcotics'
+        - key: CUSTOM_TYPE_KEY
+          description: Key of the custom Type (scoped to cart + order) that holds the signatureRequired field. Point this at your existing cart custom Type if you already have one.
+          required: false
+          default: 'signature-required'
+        - key: FLAG_FIELD_NAME
+          description: Name of the Boolean custom field that carries the flag.
+          required: false
+          default: 'signatureRequired'
+        - key: EXTENSION_KEY
+          description: Key used for the registered cart API Extension.
+          required: false
+          default: 'signature-required-cart-extension'
+        - key: EXTENSION_TIMEOUT_MS
+          description: API Extension response timeout in milliseconds (max 10000).
+          required: false
+          default: '2000'
+      securedConfiguration:
+        - key: EXTENSION_AUTH_SECRET
+          description: Shared secret commercetools sends in the Authorization header (Bearer) when calling the extension. The handler rejects any call without it.
+          required: true
+inheritAs:
+  # The platform auto-generates a least-privilege API client at install time and
+  # injects CTP_PROJECT_KEY / CTP_CLIENT_ID / CTP_CLIENT_SECRET / CTP_SCOPE /
+  # CTP_API_URL / CTP_AUTH_URL as environment variables. Do NOT also declare those
+  # keys in configuration above.
+  apiClient:
+    scopes:
+      - manage_extensions   # register/update the cart API Extension (postDeploy)
+      - manage_types        # create the custom Type and read it at runtime (view is implied)

@@ -1,0 +1,16 @@
+server:
+  # Connect provides the port to bind to via the PORT env var.
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: signature-required-service
+  # We serialize/deserialize commercetools models with the SDK's own ObjectMapper
+  # (see CtpConfig), so Spring's default JSON handling stays out of the way.
+  mvc:
+    log-resolved-exception: false
+
+logging:
+  level:
+    root: INFO
+    com.commercetools.signature: INFO

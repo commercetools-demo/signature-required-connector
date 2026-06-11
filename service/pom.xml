@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.4</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.commercetools.signature</groupId>
+  <artifactId>signature-required-service</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>signature-required-service</name>
+  <description>commercetools Connect service that flags carts/orders containing narcotic products as signatureRequired</description>
+
+  <properties>
+    <java.version>17</java.version>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- commercetools Java SDK. Bump to the latest if a newer release is available. -->
+    <commercetools.version>17.27.0</commercetools.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- commercetools Composable Commerce Java SDK (models + typed API builder) -->
+    <dependency>
+      <groupId>com.commercetools.sdk</groupId>
+      <artifactId>commercetools-sdk-java-api</artifactId>
+      <version>${commercetools.version}</version>
+    </dependency>
+    <!-- Default HTTP client + OAuth2 token handling for the SDK -->
+    <dependency>
+      <groupId>com.commercetools.sdk</groupId>
+      <artifactId>commercetools-http-client</artifactId>
+      <version>${commercetools.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Produces the executable fat jar Connect runs for the service application. -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>com.commercetools.signature.Application</mainClass>
+        </configuration>
+      </plugin>
+
+      <!-- Used by connect.yaml postDeploy/preUndeploy to run the lifecycle mains. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+      </plugin>
+
+      <!-- Allow Mockito/ByteBuddy to run on JDKs newer than it officially supports
+           (e.g. local JDK 25/26). No effect on the Java 17 Connect runtime. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

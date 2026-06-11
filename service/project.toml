@@ -1,0 +1,6 @@
+# Read by the Cloud Native Buildpacks (`pack`) build the Connect CLI runs.
+# Pin the Java runtime so the buildpack doesn't try to resolve "latest" (whose
+# manifest is currently unreachable) and so the build matches Connect's Java 17 LTS.
+[[build.env]]
+name = "GOOGLE_RUNTIME_VERSION"
+value = "17"

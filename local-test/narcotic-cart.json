@@ -1,0 +1,29 @@
+{
+  "action": "Update",
+  "resource": {
+    "typeId": "cart",
+    "id": "0a1552e1-101e-4840-b401-744c67a331c1",
+    "obj": {
+      "type": "Cart",
+      "id": "0a1552e1-101e-4840-b401-744c67a331c1",
+      "version": 3,
+      "cartState": "Active",
+      "lineItems": [
+        {
+          "id": "1c27a1db-289d-4934-89c1-c67b04db0496",
+          "productId": "56fc033e-25de-484b-bf31-fc0b97143aa9",
+          "name": { "en": "Codeine Syrup" },
+          "quantity": 1,
+          "variant": {
+            "id": 1,
+            "sku": "NARC-001",
+            "attributes": [
+              { "name": "narcotics", "value": true }
+            ]
+          }
+        }
+      ],
+      "totalLineItemQuantity": 1
+    }
+  }
+}

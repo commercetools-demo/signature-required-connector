@@ -1,0 +1,29 @@
+{
+  "action": "Update",
+  "resource": {
+    "typeId": "cart",
+    "id": "0a1552e1-101e-4840-b401-744c67a331c1",
+    "obj": {
+      "type": "Cart",
+      "id": "0a1552e1-101e-4840-b401-744c67a331c1",
+      "version": 3,
+      "cartState": "Active",
+      "lineItems": [
+        {
+          "id": "aab03288-fd14-4bb1-9a23-e506774ac040",
+          "productId": "f018cbd1-8fd3-44b0-9071-4e60d3d66ad9",
+          "name": { "en": "Vitamin C" },
+          "quantity": 2,
+          "variant": {
+            "id": 1,
+            "sku": "VIT-001",
+            "attributes": [
+              { "name": "narcotics", "value": false }
+            ]
+          }
+        }
+      ],
+      "totalLineItemQuantity": 2
+    }
+  }
+}
