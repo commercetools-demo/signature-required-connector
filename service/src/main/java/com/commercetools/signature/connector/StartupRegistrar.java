@@ -42,11 +42,12 @@ public class StartupRegistrar implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        // Diagnostics: which platform-injected variables are present at runtime (names only).
-        log.info("StartupRegistrar: CONNECT_SERVICE_URL set={}, CTP_API_URL set={}, CTP_AUTH_URL set={}, "
-                        + "CTP_SCOPE set={}, CTP_PROJECT_KEY set={}",
-                isSet("CONNECT_SERVICE_URL"), isSet("CTP_API_URL"), isSet("CTP_AUTH_URL"),
-                isSet("CTP_SCOPE"), isSet("CTP_PROJECT_KEY"));
+        // Diagnostics: which platform-injected variables are present at runtime, and the granted
+        // scopes (scopes are not secret) so we can confirm manage_types/manage_extensions applied.
+        log.info("StartupRegistrar: CONNECT_SERVICE_URL set={}, CTP_API_URL={}, CTP_AUTH_URL={}, "
+                        + "CTP_PROJECT_KEY={}, CTP_SCOPE='{}'",
+                isSet("CONNECT_SERVICE_URL"), System.getenv("CTP_API_URL"), System.getenv("CTP_AUTH_URL"),
+                System.getenv("CTP_PROJECT_KEY"), System.getenv("CTP_SCOPE"));
         try {
             ConnectorRegistrar.ensureType(apiRoot, settings.customTypeKey(), settings.flagFieldName());
 
@@ -59,8 +60,19 @@ public class StartupRegistrar implements ApplicationRunner {
             }
             log.info("StartupRegistrar completed.");
         } catch (Exception e) {
-            // Don't crash the service; surface the error so it's visible in the deployment logs.
-            log.error("StartupRegistrar failed to register Type/Extension: {}", e.getMessage(), e);
+            // Don't crash the service; surface a concise, complete error in the deployment logs.
+            Throwable cause = e;
+            while (cause instanceof java.util.concurrent.CompletionException && cause.getCause() != null) {
+                cause = cause.getCause();
+            }
+            if (cause instanceof io.vrap.rmf.base.client.ApiHttpException api) {
+                String body = api.getMessage() == null ? "" : api.getMessage();
+                int max = Math.min(body.length(), 600);
+                log.error("StartupRegistrar failed: commercetools returned HTTP {} for the registration call. "
+                        + "Detail (first {} chars): {}", api.getStatusCode(), max, body.substring(0, max));
+            } else {
+                log.error("StartupRegistrar failed ({}): {}", cause.getClass().getName(), cause.getMessage());
+            }
         }
     }
 
