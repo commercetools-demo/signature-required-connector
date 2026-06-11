@@ -3,10 +3,12 @@ deployAs:
     applicationType: service
     endpoint: /service
     scripts:
-      # Connect runs lifecycle scripts from the application directory (service/).
-      # Java connectors are built with Maven; these mains use the commercetools Java SDK.
-      postDeploy: mvn -B -q compile exec:java -Dexec.mainClass=com.commercetools.signature.connector.PostDeploy
-      preUndeploy: mvn -B -q compile exec:java -Dexec.mainClass=com.commercetools.signature.connector.PreUndeploy
+      # Lifecycle scripts run in the buildpack RUN image, which has a JRE but NOT Maven.
+      # So we invoke the connector mains from the already-built Spring Boot fat jar using
+      # the Spring Boot PropertiesLauncher (-Dloader.main selects the class to run). No
+      # Maven, no recompile, no dependency download at deploy time.
+      postDeploy: java -Dloader.main=com.commercetools.signature.connector.PostDeploy -cp target/signature-required-service-1.0.0.jar org.springframework.boot.loader.launch.PropertiesLauncher
+      preUndeploy: java -Dloader.main=com.commercetools.signature.connector.PreUndeploy -cp target/signature-required-service-1.0.0.jar org.springframework.boot.loader.launch.PropertiesLauncher
     configuration:
       standardConfiguration:
         - key: NARCOTICS_ATTRIBUTE_NAME
